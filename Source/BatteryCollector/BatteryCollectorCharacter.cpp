@@ -11,6 +11,8 @@
 #include "Components/SceneComponent.h"
 #include "Components/SphereComponent.h"
 
+#include "Pickup.h"
+
 //////////////////////////////////////////////////////////////////////////
 // ABatteryCollectorCharacter
 
@@ -46,8 +48,9 @@ ABatteryCollectorCharacter::ABatteryCollectorCharacter()
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
     collectionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollectionSphere"));
-    //SetRootComponent(collectionSphere);
-    collectionSphere = AttachTo(RootComponent);
+    //collectionSphere->AttachTo(RootComponent);
+    collectionSphere->SetupAttachment(RootComponent);
+    //collectionSphere->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
     collectionSphere->SetSphereRadius(200.f);
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
@@ -62,7 +65,9 @@ void ABatteryCollectorCharacter::SetupPlayerInputComponent(class UInputComponent
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+    PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+
+    PlayerInputComponent->BindAction("Collect", IE_Pressed, this, &ABatteryCollectorCharacter::CollectPickups);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ABatteryCollectorCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ABatteryCollectorCharacter::MoveRight);
@@ -138,4 +143,19 @@ void ABatteryCollectorCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void ABatteryCollectorCharacter::CollectPickups()
+{
+    TArray<AActor *> collectedActors;
+    collectionSphere->GetOverlappingActors(collectedActors);
+
+    for (auto actor : collectedActors) {
+        auto testPickup = Cast<APickup>(actor);
+
+        if (testPickup && !testPickup->IsPendingKill() && testPickup->IsActive()) {
+            testPickup->WasCollected();
+            testPickup->SetActive(false);
+        }
+    }
 }
