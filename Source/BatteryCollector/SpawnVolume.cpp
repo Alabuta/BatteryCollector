@@ -3,6 +3,11 @@
 #include "SpawnVolume.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Engine/World.h"
+#include "TimerManager.h"
+
+#include "Pickup.h"
+
 
 
 // Sets default values
@@ -13,6 +18,9 @@ ASpawnVolume::ASpawnVolume()
 
     whereToSpawn = CreateDefaultSubobject<UBoxComponent>(TEXT("WhereToSpawn"));
     SetRootComponent(whereToSpawn);
+
+    spawnDelayRangeLow = 1.f;
+    spawnDelayRangeHigh = 4.5f;
 }
 
 // Called when the game starts or when spawned
@@ -20,6 +28,8 @@ void ASpawnVolume::BeginPlay()
 {
 	Super::BeginPlay();
 	
+    spawnDelay = FMath::FRandRange(spawnDelayRangeLow, spawnDelayRangeHigh);
+    GetWorldTimerManager().SetTimer(spawnTimer, this, &ASpawnVolume::SpawnPickup, spawnDelay, false);
 }
 
 // Called every frame
@@ -35,4 +45,29 @@ FVector ASpawnVolume::GetRandomPointInVolume()
     auto &&spwanExtend = whereToSpawn->Bounds.BoxExtent;
 
     return UKismetMathLibrary::RandomPointInBoundingBox(spawnOrigin, spwanExtend);
+}
+
+void ASpawnVolume::SpawnPickup()
+{
+    if (whatToSpawn) {
+        auto const world = GetWorld();
+
+        if (world) {
+            FActorSpawnParameters spawnParams;
+            spawnParams.Owner = this;
+            spawnParams.Instigator = Instigator;
+
+            auto spawnLocation = GetRandomPointInVolume();
+
+            FRotator spawnRotation;
+            spawnRotation.Yaw = FMath::FRand() * 360.f;
+            spawnRotation.Pitch = FMath::FRand() * 360.f;
+            spawnRotation.Roll = FMath::FRand() * 360.f;
+
+            auto spawnedPickup = world->SpawnActor<APickup>(whatToSpawn, spawnLocation, spawnRotation, spawnParams);
+
+            spawnDelay = FMath::FRandRange(spawnDelayRangeLow, spawnDelayRangeHigh);
+            GetWorldTimerManager().SetTimer(spawnTimer, this, &ASpawnVolume::SpawnPickup, spawnDelay, false);
+        }
+    }
 }

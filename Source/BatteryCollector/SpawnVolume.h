@@ -13,13 +13,8 @@ class BATTERYCOLLECTOR_API ASpawnVolume : public AActor
 	
 public:	
 	// Sets default values for this actor's properties
-	ASpawnVolume();
+    ASpawnVolume();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -28,12 +23,27 @@ public:
     UFUNCTION(BlueprintPure, Category = "Spawning")
     FVector GetRandomPointInVolume();
 
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+    UPROPERTY(EditAnywhere, Category = "Spawning")
+    TSubclassOf<class APickup> whatToSpawn;
+
+    FTimerHandle spawnTimer;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
+    float spawnDelayRangeLow;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
+    float spawnDelayRangeHigh;
+
 private:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
     class UBoxComponent *whereToSpawn;
 
-
+    void SpawnPickup();
 	
-	
+    float spawnDelay{1.f};
 };
