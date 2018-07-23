@@ -12,13 +12,19 @@
 UCLASS()
 class BATTERYCOLLECTOR_API ABatteryPickup : public APickup
 {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
+protected:
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power"/*, meta = (BlueprintProtected = "true")*/)
+    float batteryPower;
+
 public:
 
     ABatteryPickup();
 
     void WasCollected_Implementation() override;
 	
+    float GetBatteryPower() const noexcept { return batteryPower; }
 	
 };
