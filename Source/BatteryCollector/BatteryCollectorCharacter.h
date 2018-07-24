@@ -82,8 +82,17 @@ protected:
     UFUNCTION(BlueprintCallable, Category = "Pickups")
     void CollectPickups();
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power", Meta = (BlueprintProtected = "true"))
     float initialPower;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power", Meta = (BlueprintProtected = "true"))
+    float speedFactor;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power", Meta = (BlueprintProtected = "true"))
+    float baseSpeed;
+
+    UFUNCTION(BlueprintImplementableEvent, Category = "Power")
+    void PowerChangeEffect();
 
 public:
 	/** Returns CameraBoom subobject **/

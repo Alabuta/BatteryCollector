@@ -59,6 +59,9 @@ ABatteryCollectorCharacter::ABatteryCollectorCharacter()
 
     initialPower = 2000.f;
     characterPower = initialPower;
+
+    speedFactor = .75f;
+    baseSpeed = 10.f;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -175,4 +178,8 @@ void ABatteryCollectorCharacter::CollectPickups()
 void ABatteryCollectorCharacter::UpdatePower(float powerChange)
 {
     characterPower += powerChange;
+
+    GetCharacterMovement()->MaxWalkSpeed = baseSpeed + speedFactor * characterPower;
+
+    PowerChangeEffect();
 }

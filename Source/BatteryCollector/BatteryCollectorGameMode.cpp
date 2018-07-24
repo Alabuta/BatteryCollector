@@ -15,7 +15,7 @@ ABatteryCollectorGameMode::ABatteryCollectorGameMode()
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 
-    decayRate = .01f;
+    decayRate = .1f;
 }
 
 void ABatteryCollectorGameMode::Tick(float deltaTime)
