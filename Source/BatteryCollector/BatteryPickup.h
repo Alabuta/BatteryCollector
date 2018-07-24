@@ -16,7 +16,7 @@ class BATTERYCOLLECTOR_API ABatteryPickup : public APickup
 
 protected:
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power"/*, meta = (BlueprintProtected = "true")*/)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power", Meta = (BlueprintProtected = "true"))
     float batteryPower;
 
 public:

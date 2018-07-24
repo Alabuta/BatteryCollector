@@ -40,7 +40,7 @@ protected:
 
 private:
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawning", Meta = (AllowPrivateAccess = "true"))
     class UBoxComponent *whereToSpawn;
 
     void SpawnPickup();

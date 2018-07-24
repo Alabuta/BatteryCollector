@@ -12,6 +12,7 @@
 #include "Components/SphereComponent.h"
 
 #include "Pickup.h"
+#include "BatteryPickup.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ABatteryCollectorCharacter
@@ -55,6 +56,9 @@ ABatteryCollectorCharacter::ABatteryCollectorCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+
+    initialPower = 2000.f;
+    characterPower = initialPower;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -150,12 +154,25 @@ void ABatteryCollectorCharacter::CollectPickups()
     TArray<AActor *> collectedActors;
     collectionSphere->GetOverlappingActors(collectedActors);
 
+    float collectedPower = 0.f;
+
     for (auto actor : collectedActors) {
         auto testPickup = Cast<APickup>(actor);
 
         if (testPickup && !testPickup->IsPendingKill() && testPickup->IsActive()) {
             testPickup->WasCollected();
+
+            auto testBattery = Cast<ABatteryPickup>(testPickup);
+            if (testBattery) collectedPower += testBattery->GetBatteryPower();
+
             testPickup->SetActive(false);
         }
     }
+
+    if (collectedPower > 0.f) UpdatePower(collectedPower);
+}
+
+void ABatteryCollectorCharacter::UpdatePower(float powerChange)
+{
+    characterPower += powerChange;
 }

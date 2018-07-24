@@ -40,7 +40,7 @@ public:
 
 private:
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup", meta = (AllowPrivateAccess = "true"))
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup", Meta = (AllowPrivateAccess = "true"))
     class UStaticMeshComponent *pickupMesh;
 	
 };

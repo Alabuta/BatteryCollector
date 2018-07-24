@@ -23,6 +23,9 @@ class ABatteryCollectorCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USphereComponent *collectionSphere;
 
+    UPROPERTY(VisibleAnywhere, Category = "Power")
+    float characterPower;
+
 public:
 	ABatteryCollectorCharacter();
 
@@ -33,6 +36,15 @@ public:
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
+
+    UFUNCTION(BlueprintPure, Category = "Power")
+    float GetInitialPower() const noexcept { return initialPower; }
+
+    UFUNCTION(BlueprintPure, Category = "Power")
+    float GetCurrentPower() const noexcept { return characterPower; }
+
+    UFUNCTION(BlueprintCallable, Category = "Power")
+    void UpdatePower(float powerChange);
 
 protected:
 
@@ -63,13 +75,15 @@ protected:
 	/** Handler for when a touch input stops. */
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
 
-protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
 
     UFUNCTION(BlueprintCallable, Category = "Pickups")
     void CollectPickups();
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power")
+    float initialPower;
 
 public:
 	/** Returns CameraBoom subobject **/
