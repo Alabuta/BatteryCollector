@@ -5,6 +5,7 @@
 #include "UObject/ConstructorHelpers.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "Blueprint/UserWidget.h"
 
 ABatteryCollectorGameMode::ABatteryCollectorGameMode()
 {
@@ -20,13 +21,30 @@ ABatteryCollectorGameMode::ABatteryCollectorGameMode()
     PrimaryActorTick.bCanEverTick = true;
 }
 
-void ABatteryCollectorGameMode::Tick(float DeltaTime)
+void ABatteryCollectorGameMode::BeginPlay()
 {
-    Super::Tick(DeltaTime);
+    Super::BeginPlay();
+
+    auto myCharacter = Cast<ABatteryCollectorCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
+
+    if (myCharacter)
+        powerToWin = myCharacter->GetInitialPower() * 1.25f;
+
+    if (HUDWidgetClass) {
+        currentWidget = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetClass);
+
+        if (currentWidget)
+            currentWidget->AddToViewport();
+    }
+}
+
+void ABatteryCollectorGameMode::Tick(float deltaTime)
+{
+    Super::Tick(deltaTime);
 
     auto myCharacter = Cast<ABatteryCollectorCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
 
     if (myCharacter)
         if (myCharacter->GetCurrentPower() > 0)
-            myCharacter->UpdatePower(-DeltaTime * decayRate * myCharacter->GetInitialPower());
+            myCharacter->UpdatePower(-deltaTime * decayRate * myCharacter->GetInitialPower());
 }
