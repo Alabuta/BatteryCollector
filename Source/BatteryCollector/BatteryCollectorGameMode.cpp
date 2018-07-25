@@ -16,16 +16,17 @@ ABatteryCollectorGameMode::ABatteryCollectorGameMode()
 	}
 
     decayRate = .1f;
+
+    PrimaryActorTick.bCanEverTick = true;
 }
 
-void ABatteryCollectorGameMode::Tick(float deltaTime)
+void ABatteryCollectorGameMode::Tick(float DeltaTime)
 {
-    Super::Tick(deltaTime);
+    Super::Tick(DeltaTime);
 
     auto myCharacter = Cast<ABatteryCollectorCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
-    UE_LOG(LogClass, Log, TEXT("!!!!!!!!!!!!!!"))
 
     if (myCharacter)
         if (myCharacter->GetCurrentPower() > 0)
-            myCharacter->UpdatePower(-deltaTime * decayRate * myCharacter->GetInitialPower());
+            myCharacter->UpdatePower(-DeltaTime * decayRate * myCharacter->GetInitialPower());
 }

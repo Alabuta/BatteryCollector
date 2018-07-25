@@ -14,7 +14,7 @@ class ABatteryCollectorGameMode : public AGameModeBase
 public:
 	ABatteryCollectorGameMode();
 
-    virtual void Tick(float deltaTime) override;
+    virtual void Tick(float DeltaTime) override;
 
 protected:
 
