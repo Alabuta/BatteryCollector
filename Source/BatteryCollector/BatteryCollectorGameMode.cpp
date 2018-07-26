@@ -25,6 +25,8 @@ void ABatteryCollectorGameMode::BeginPlay()
 {
     Super::BeginPlay();
 
+    SetCurrentState(eBatteryPlayState::nPlaying);
+
     auto myCharacter = Cast<ABatteryCollectorCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
 
     if (myCharacter)
@@ -44,7 +46,13 @@ void ABatteryCollectorGameMode::Tick(float deltaTime)
 
     auto myCharacter = Cast<ABatteryCollectorCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
 
-    if (myCharacter)
-        if (myCharacter->GetCurrentPower() > 0)
+    if (myCharacter) {
+        if (myCharacter->GetCurrentPower() > powerToWin)
+            SetCurrentState(eBatteryPlayState::nWon);
+
+        else if (myCharacter->GetCurrentPower() > 0)
             myCharacter->UpdatePower(-deltaTime * decayRate * myCharacter->GetInitialPower());
+
+        else SetCurrentState(eBatteryPlayState::nGameOver);
+    }
 }
