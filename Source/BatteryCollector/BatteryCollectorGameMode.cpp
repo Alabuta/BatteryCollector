@@ -6,6 +6,11 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/PawnMovementComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+
+#include "SpawnVolume.h"
 
 ABatteryCollectorGameMode::ABatteryCollectorGameMode()
 {
@@ -24,6 +29,17 @@ ABatteryCollectorGameMode::ABatteryCollectorGameMode()
 void ABatteryCollectorGameMode::BeginPlay()
 {
     Super::BeginPlay();
+
+    TArray<AActor *> foundActors;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASpawnVolume::StaticClass(), foundActors);
+
+    for (auto actor : foundActors) {
+        auto spawnVolumeActor = Cast<ASpawnVolume>(actor);
+
+        if (spawnVolumeActor) {
+            spawnVolumeActors.AddUnique(spawnVolumeActor);
+        }
+    }
 
     SetCurrentState(eBatteryPlayState::nPlaying);
 
@@ -56,3 +72,54 @@ void ABatteryCollectorGameMode::Tick(float deltaTime)
         else SetCurrentState(eBatteryPlayState::nGameOver);
     }
 }
+
+void ABatteryCollectorGameMode::SetCurrentState(eBatteryPlayState state) noexcept
+{
+    currentState = state;
+    HandleNewState(state);
+}
+
+void ABatteryCollectorGameMode::HandleNewState(eBatteryPlayState state)
+{
+    switch (state) {
+        case eBatteryPlayState::nPlaying:
+            for (auto spawnVolumeActor : spawnVolumeActors)
+                spawnVolumeActor->SetSpawningActive(true);
+
+            break;
+
+        case eBatteryPlayState::nGameOver:
+            for (auto spawnVolumeActor : spawnVolumeActors)
+                spawnVolumeActor->SetSpawningActive(false);
+
+            {
+                auto playerController = UGameplayStatics::GetPlayerController(this, 0);
+
+                if (playerController) {
+                    playerController->SetCinematicMode(true, false, false, true, true);
+                }
+
+                auto myCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
+
+                if (myCharacter) {
+                    auto mesh = myCharacter->GetMesh();
+                    mesh->SetSimulatePhysics(true);
+
+                    auto movementComponent = myCharacter->GetMovementComponent();
+                    movementComponent->MovementState.bCanJump = false;
+                }
+            }
+
+            break;
+
+        case eBatteryPlayState::nWon:
+            for (auto spawnVolumeActor : spawnVolumeActors)
+                spawnVolumeActor->SetSpawningActive(false);
+
+            break;
+
+        default:
+            break;
+    }
+}
+

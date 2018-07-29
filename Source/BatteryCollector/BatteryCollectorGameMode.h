@@ -32,7 +32,7 @@ public:
     UFUNCTION(BlueprintPure, Category = "Power")
     eBatteryPlayState GetCurrentState() const noexcept { return currentState; }
 
-    void SetCurrentState(eBatteryPlayState state) noexcept { currentState = state; }
+    void SetCurrentState(eBatteryPlayState state) noexcept;
 
 protected:
 
@@ -51,6 +51,10 @@ protected:
 private:
 
     eBatteryPlayState currentState;
+
+    TArray<class ASpawnVolume *> spawnVolumeActors;
+
+    void HandleNewState(eBatteryPlayState state);
 };
 
 

@@ -23,6 +23,9 @@ public:
     UFUNCTION(BlueprintPure, Category = "Spawning")
     FVector GetRandomPointInVolume();
 
+    UFUNCTION(BlueprintCallable, Category = "Spawning")
+    void SetSpawningActive(bool shouldSpawn);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
